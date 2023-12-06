@@ -3,7 +3,7 @@ const koaBody = require("koa-body");
 const routes = require("./routes/routes.js");
 const routesView = require("./routes/productViewRoute.js");
 const { faker } = require("@faker-js/faker");
-const { writeFile } = require("./utils/readFile.js");
+const { writeFile } = require("./utils/writeFile.js");
 const views = require("koa-views");
 const path = require("path");
 
@@ -34,7 +34,7 @@ const generateBooks = () => {
         };
         listProduct.push(product);
     }
-    writeFile(listProduct);
+    // writeFile(listProduct);
 };
 // generateBooks();
 

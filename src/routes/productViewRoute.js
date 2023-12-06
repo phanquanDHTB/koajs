@@ -1,11 +1,10 @@
 const Router = require("koa-router");
-const { readFile } = require("../utils/readFile");
+const products = require("../database/products.json");
 
 const router = new Router({});
 
 router.get("/product", async (ctx) => {
-    const product = readFile();
-    await ctx.render("index", { product });
+    await ctx.render("index", { products });
 });
 
 module.exports = router;

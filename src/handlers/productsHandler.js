@@ -6,29 +6,30 @@ const {
     deleteProduct,
     getProductById,
 } = require("../database/productRepository");
-const { readFile } = require("../utils/readFile");
+const pick = require("../helpers/pick");
 
 const getProductsHandler = async (ctx) => {
     try {
         const { limit, sort } = ctx.request.query;
-        if (limit) {
-            const listProductLimit = getProducts(limit);
-            ctx.body = {
-                data: listProductLimit,
-            };
-        }
         if (sort) {
             const listProductSort = sortProducts(sort);
-            ctx.body = {
+            return (ctx.body = {
                 data: listProductSort,
-            };
+            });
         }
+        if (limit) {
+            const listProductLimit = getProducts(limit);
+            return (ctx.body = {
+                data: listProductLimit,
+            });
+        }
+        throw new Error("Query not found");
     } catch (err) {
         ctx.status = 404;
         ctx.body = {
             success: false,
-            data: [],
-            error: e.message,
+            data: ["errr"],
+            error: err.message,
         };
     }
 };
@@ -46,7 +47,7 @@ const createProductHandler = async (ctx) => {
         ctx.body = {
             success: false,
             data: [],
-            error: e.message,
+            error: err.message,
         };
     }
 };
@@ -55,19 +56,20 @@ const changInforProductHandler = async (ctx) => {
     try {
         const { id } = ctx.params;
         const productData = ctx.request.body;
-        const oldProduct = readFile().filter((product) => product.id === id);
+        const oldProduct = getProductById(id);
         if (oldProduct.length) {
             changeInforProduct({ ...productData, id });
-            ctx.body = {
-                data: [],
-            };
+            return (ctx.body = {
+                data: { ...productData, id },
+            });
         }
+        throw new Error("Product not found");
     } catch (err) {
         ctx.status = 404;
         ctx.body = {
             success: false,
             data: [],
-            error: e.message,
+            error: err.message,
         };
     }
 };
@@ -77,14 +79,14 @@ const deletteProductHandler = async (ctx) => {
         const { id } = ctx.params;
         deleteProduct(id);
         ctx.body = {
-            data: [],
+            data: "ok",
         };
     } catch (err) {
         ctx.status = 404;
         ctx.body = {
             success: false,
             data: [],
-            error: e.message,
+            error: err.message,
         };
     }
 };
@@ -95,24 +97,18 @@ const getProductByIdHandler = async (ctx) => {
         const { field } = ctx.request.query;
         const listField = field.split(",");
         const product = getProductById(id);
-        if (product) {
-            ctx.body = {
-                data: [
-                    Object.keys(product[0]).reduce((result, key) => {
-                        if (listField.includes(key)) {
-                            result[key] = product[0][key];
-                        }
-                        return result;
-                    }, {}),
-                ],
-            };
+        if (product.length) {
+            return (ctx.body = {
+                data: pick(product[0], listField),
+            });
         }
+        throw new Error("Product not found");
     } catch (err) {
         ctx.status = 404;
         ctx.body = {
             success: false,
             data: [],
-            error: e.message,
+            error: err.message,
         };
     }
 };
