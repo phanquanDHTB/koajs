@@ -10,7 +10,7 @@ const pick = require("../helpers/pick");
 const getProductsHandler = async (ctx) => {
     try {
         const { limit, sort } = ctx.request.query;
-        const products = getProducts(limit, sort);
+        const products = getProducts({ limit, sort });
         return (ctx.body = {
             data: products,
         });
@@ -81,12 +81,9 @@ const getProductByIdHandler = async (ctx) => {
         const { field } = ctx.request.query;
         const listField = field.split(",");
         const product = getProductById(id);
-        if (product) {
-            return (ctx.body = {
-                data: pick(product[0], listField),
-            });
-        }
-        throw new Error("Product not found");
+        return (ctx.body = {
+            data: pick(product[0], listField),
+        });
     } catch (err) {
         ctx.status = 404;
         ctx.body = {

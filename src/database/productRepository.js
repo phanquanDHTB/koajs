@@ -8,13 +8,14 @@ const { desc, asc } = require("../helpers/sort");
  * @param {"asc" | "desc"} sort
  * @returns
  */
-const getProducts = (limit, sort) => {
+const getProducts = ({ limit, sort }) => {
     if (limit) {
         return file.slice(0, limit);
     }
     if (sort === "desc") {
         return file.sort(desc);
-    } else if (sort === "asc") {
+    }
+    if (sort === "asc") {
         return file.sort(asc);
     }
     return file;
@@ -37,7 +38,9 @@ const createProduct = (product) => {
  * @returns
  */
 const getProductById = (id) => {
-    return file.find((product) => product.id == id);
+    const product = file.find((product) => product.id == id);
+    if (product) return product;
+    throw new Error("Product not found");
 };
 
 /**
