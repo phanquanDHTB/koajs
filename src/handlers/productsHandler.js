@@ -1,6 +1,5 @@
 const {
     getProducts,
-    sortProducts,
     createProduct,
     changeInforProduct,
     deleteProduct,
@@ -11,24 +10,15 @@ const pick = require("../helpers/pick");
 const getProductsHandler = async (ctx) => {
     try {
         const { limit, sort } = ctx.request.query;
-        if (sort) {
-            const listProductSort = sortProducts(sort);
-            return (ctx.body = {
-                data: listProductSort,
-            });
-        }
-        if (limit) {
-            const listProductLimit = getProducts(limit);
-            return (ctx.body = {
-                data: listProductLimit,
-            });
-        }
-        throw new Error("Query not found");
+        const products = getProducts(limit, sort);
+        return (ctx.body = {
+            data: products,
+        });
     } catch (err) {
         ctx.status = 404;
         ctx.body = {
             success: false,
-            data: ["errr"],
+            data: "err",
             error: err.message,
         };
     }
@@ -37,8 +27,7 @@ const getProductsHandler = async (ctx) => {
 const createProductHandler = async (ctx) => {
     try {
         const productData = ctx.request.body;
-        const newProduct = { ...productData, createdAt: new Date() };
-        createProduct(newProduct);
+        const newProduct = createProduct(productData);
         ctx.body = {
             data: newProduct,
         };
@@ -54,16 +43,11 @@ const createProductHandler = async (ctx) => {
 
 const changInforProductHandler = async (ctx) => {
     try {
-        const { id } = ctx.params;
         const productData = ctx.request.body;
-        const oldProduct = getProductById(id);
-        if (oldProduct.length) {
-            changeInforProduct({ ...productData, id });
-            return (ctx.body = {
-                data: { ...productData, id },
-            });
-        }
-        throw new Error("Product not found");
+        const newProduct = changeInforProduct(productData);
+        return (ctx.body = {
+            data: newProduct,
+        });
     } catch (err) {
         ctx.status = 404;
         ctx.body = {
@@ -97,7 +81,7 @@ const getProductByIdHandler = async (ctx) => {
         const { field } = ctx.request.query;
         const listField = field.split(",");
         const product = getProductById(id);
-        if (product.length) {
+        if (product) {
             return (ctx.body = {
                 data: pick(product[0], listField),
             });

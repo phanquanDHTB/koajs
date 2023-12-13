@@ -11,7 +11,6 @@ const productsMiddleware = async (ctx, next) => {
             color: yup.string().required(),
             image: yup.string().required(),
         });
-
         await schema.validate(productData);
         next();
     } catch (e) {

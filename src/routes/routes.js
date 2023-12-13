@@ -14,7 +14,7 @@ const router = new Router({
 
 router.get("/products", getProductsHandler);
 router.post("/product", productsMiddleware, createProductHandler);
-router.put("/product/:id", productsMiddleware, changInforProductHandler);
+router.put("/product", productsMiddleware, changInforProductHandler);
 router.delete("/product/:id", deletteProductHandler);
 router.get("/product/:id", getProductByIdHandler);
 

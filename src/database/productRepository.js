@@ -5,22 +5,19 @@ const { desc, asc } = require("../helpers/sort");
 /**
  *
  * @param {number} limit
- * @returns
- */
-const getProducts = (limit) => {
-    return file.slice(0, limit);
-};
-
-/**
- *
  * @param {"asc" | "desc"} sort
  * @returns
  */
-const sortProducts = (sort) => {
+const getProducts = (limit, sort) => {
+    if (limit) {
+        return file.slice(0, limit);
+    }
     if (sort === "desc") {
         return file.sort(desc);
+    } else if (sort === "asc") {
+        return file.sort(asc);
     }
-    return file.sort(asc);
+    return file;
 };
 
 /**
@@ -29,8 +26,18 @@ const sortProducts = (sort) => {
  *  product: string, color: string, createdAt: Date, image: string }} product
  */
 const createProduct = (product) => {
-    const newListProduct = [...file, { ...product, id: file[file.length - 1].id + 1 }];
+    const newListProduct = [...file, { ...product, id: file[file.length - 1].id + 1, createdAt: new Date() }];
     writeFile(newListProduct);
+    return { ...product, id: file[file.length - 1].id + 1, createdAt: new Date() };
+};
+
+/**
+ *
+ * @param {number} id
+ * @returns
+ */
+const getProductById = (id) => {
+    return file.find((product) => product.id == id);
 };
 
 /**
@@ -40,7 +47,12 @@ const createProduct = (product) => {
  */
 const changeInforProduct = (productChange) => {
     const { id } = productChange;
-    writeFile(file.map((product) => (product.id == id ? productChange : product)));
+    const oldProduct = getProductById(id);
+    if (oldProduct) {
+        writeFile(file.map((product) => (product.id == id ? productChange : product)));
+        return productChange;
+    }
+    throw new Error("Product not found");
 };
 
 /**
@@ -52,13 +64,4 @@ const deleteProduct = (id) => {
     writeFile(newListProduct);
 };
 
-/**
- *
- * @param {number} id
- * @returns
- */
-const getProductById = (id) => {
-    return file.filter((product) => product.id == id);
-};
-
-module.exports = { getProducts, sortProducts, createProduct, deleteProduct, changeInforProduct, getProductById };
+module.exports = { getProducts, createProduct, deleteProduct, changeInforProduct, getProductById };
